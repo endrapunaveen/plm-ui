@@ -1,0 +1,222 @@
+<div class="row">
+	<div class="row">
+	    <div class="col-lg-12">
+	    	<br/>
+	    	<h3 style="display:inline;"> Manage Metadata </h3>
+	    	<hr>
+	    </div>
+	    <div class="form-horizontal">
+	    	<div class="row">
+			    <div class="col-lg-12">
+				    <label class="control-label col-md-5" >Catalogue :</label> 
+				    <div class="col-md-5">
+				        <select class="form-control" name="catalogue"
+					        ng-model="catalogue" ng-change="getMetadata(catalogue)"
+					        ng-options="catalogues.name for catalogues in catalogues.catalogues 
+					        	| orderBy : 'name'
+					        ">
+						</select>
+			        </div>
+		        </div>
+	        </div>
+    		<hr>
+	    </div>
+    </div>
+
+    <div class="col-md-12" ng-if="loadingMetadata == true">
+    	<div class="alert alert-success">
+            <i class="fa fa-spinner fa-pulse"></i> Loading Metadata for <b>{{catalogue.name}}</b>
+        </div>
+    </div>
+
+    <div class="row" ng-if="loadingMetadata == false">
+        <div class="col-md-5">
+        	<div class="panel panel-primary">
+                <div class="panel-heading">
+                    <span class="label label-pill label-warning" 
+                    	tooltip="Total Attribute Groups">
+                    	{{metadata.attributeGroups.length}}
+                    </span>
+                    Attribute Groups 
+                    
+                    <input class="form-control"
+						type="text" ng-model="txtSsearch" class="form-control" 
+						style="width:50%; display:inline;"
+						placeholder="Search">
+					</input>
+
+                    <button class="btn btn-circle pull-right btn-warning" tooltip="Create Attribute Group"
+	    			data-toggle="modal"  ng-click="createEmployeeFun()"
+	    			data-target="#employeeModal" 
+	    			data-backdrop="static" 
+	    			data-keyboard="false"><i class="fa fa-plus"></i></button>
+	    			<div class="clearfix" ></div>
+                </div>
+
+                <div class="panel-body" style="height: 500px; overflow-y: scroll;">
+				    <div class="list-group">
+				        <a href="" class="list-group-item" ng-repeat="attributeGroup in metadata.attributeGroups | orderBy : 'name' | filter : { name : txtSsearch }" 
+				        ng-click="getAttributes(attributeGroup)">
+				           	{{attributeGroup.name}} ({{attributeGroup.displayNames[0].displayName}})
+				           	<i class="fa fa-arrow-right pull-right">
+				           	</i>
+				        </a>
+				    </div>
+				</div>
+            </div>
+        </div>
+        <div class="col-md-6" ng-if="parentDataLoading == true">
+        	<div class="alert alert-success">
+	            <i class="fa fa-spinner fa-pulse"></i> Loading..
+	        </div>
+        </div>
+        <div class="col-md-6" ng-if="parentDataLoading == false">
+        	<div class="panel panel-primary">
+                <div class="panel-heading">
+                    <i class="fa fa-group fa-fw"></i>
+                    {{attributeGroup.name}} details
+                    
+	    			<div class="clearfix" ></div>
+                </div>
+                <div class="panel-body" >
+                	<fieldset>
+		            	<div class="col-md-6">
+		            		<div class="col-md-5">
+		            			<label style="font-size: 12px; font-weight: normal;">Name</label>
+		            		</div>
+		            		<div class="col-md-7">
+		            			<label class="label-control">{{attributeGroup.name}}</label>
+		            		</div>
+		            	</div>
+		            	<div class="col-md-6">
+		            		<div class="col-lg-4">
+		            			<label style="font-size: 12px; font-weight: normal;">Behaviour</label>
+		            			
+		            		</div>
+		            		<div class="col-lg-8">
+		            			<label class="label-control">{{attributeGroup.behaviour}}</label>
+		            		</div>
+		            	</div>
+                	</fieldset>
+                	<hr>
+					<div class="row" overflow-y: scroll;">
+				        <div class="col-md-12">
+				        	<div class="panel panel-primary">
+				                <div class="panel-heading">
+				                    <i class="fa fa-group fa-fw"></i>
+				                    Display Names
+					    			<div class="clearfix" ></div>
+				                </div>
+				                <div class="panel-body" >
+				                	<div class="list-group">
+								        <a href="" class="list-group-item" ng-repeat="displayName in attributeGroup.displayNames">
+								           	{{displayName.lang}} - {{displayName.displayName}}
+								           
+								        </a>
+								    </div>
+
+								    
+								</div>
+				            </div>
+				        </div>
+				    </div>
+				    <div class="row"  overflow-y: scroll;">
+				        <div class="col-md-12">
+				        	<div class="panel panel-primary">
+				                <div class="panel-heading">
+				                    <i class="fa fa-group fa-fw"></i>
+				                    Attributes
+					    			<div class="clearfix" ></div>
+				                </div>
+				                <div class="panel-body" >
+				                	<div class="list-group">
+								        <a href="" class="list-group-item" ng-repeat="attribute in attributeGroup.attributes">
+								           	{{attribute.name}}
+								           
+								        </a>
+								    </div>
+
+								    
+								</div>
+				            </div>
+				        </div>
+				    </div>
+				</div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+    <div class="row">
+	    <div class="col-lg-12">
+		    <div class="panel panel-primary" >
+			    <div class="panel-heading">
+			    	Attribute Groups
+			    	<button type="button" class="btn btn-warning pull-right btn-circle" 
+			        tooltip="Create Product" 
+			        ng-click="createClassFun()"  
+			        data-target="#createClassModal" 
+	           		data-toggle="modal" 
+	           		data-backdrop="static" 
+					data-keyboard="false"><i class="fa fa-plus"></i>
+                    </button>
+                    <div class="clearfix"></div>
+			    </div>
+			    <div class="panel-body">
+				    <div class="row">
+		    			<div class="col-md-4" 
+		    			ng-repeat="attributeGroup in metadata.attributeGroups">
+		    			
+					    	<div class="panel panel-primary" >
+					    		<div class="panel-heading">
+					    			{{attributeGroup.name}}
+					    			
+                   					<div class="clearfix"></div>
+					    		</div>
+					    		<div class="panel-body" style="height: 400px; overflow-y: scroll;">
+					    			<div class="panel panel-yellow">
+					    				<div class="panel-heading">
+					    					Attributes
+					    					<button type="button" class="btn btn-primary pull-right btn-circle" 
+									        tooltip="Create Section in {{class.className}}" tooltip-placement="" 
+									        ng-click="createSectionFun()" 
+									        data-target="#sectionModal" 
+							           		data-toggle="modal" 
+							           		data-backdrop="static" 
+											data-keyboard="false" ><i class="fa fa-plus"></i>
+						                    </button>
+                    						<div class="clearfix"></div>
+				    					</div>
+				    					<div class="panel-body">
+							    			<div class="list-group">
+							    				<a class="list-group-item" ng-repeat="section in sections | orderBy : 'sectionName'">Section : {{section.sectionName}}
+							    				 	<button type="button" class="btn btn-info pull-right btn-circle" 
+											        tooltip="Edit section-{{section.sectionName}} of {{class.className}}" 
+											        ng-click="editSectionFun(section)"  
+											        data-target="#sectionModal" 
+									           		data-toggle="modal" 
+									           		data-backdrop="static" 
+													data-keyboard="false"><i class="fa fa-edit"></i>
+							                        </button>
+							                        <div class="clearfix"></div>
+						                        </a>
+							    			</div>
+						    			</div>
+					    			</div>
+				    			</div>
+				    			<div class="panel-footer" ng-if="class._id != selectedSection.classId">
+				    				<a href="" ng-click="getSections(class,$index)">View Sections</a>
+				    			</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	-->
+</div>
+
+
+
+

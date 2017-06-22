@@ -1,0 +1,355 @@
+<div class="row">
+
+
+	<div class="row">
+	    <div class="col-lg-12">
+	    	<br/>
+	    	<h3 style="display:inline;"> Manage Product </h3>
+	    	
+	    </div>
+	    
+	    <div class="form-horizontal">
+	    	<div class="row">
+			    <div class="col-lg-10">
+				    <label class="control-label col-md-5" >Catalogue</label> 
+				    <div class="col-md-5">
+				        <select class="form-control" name="catalogue"
+					        ng-model="catalogue" ng-change="getMetadata(catalogue)"
+					        ng-options="catalogues.name for catalogues in catalogues.catalogues">
+						</select>
+			        </div>
+		        </div>
+		        <div class="col-md-2"> 
+			        <button class="btn btn-primary" ng-click="createProduct()"> Create Product </button>
+		        </div>
+		    </div>
+	        <hr>
+	    </div>
+    </div>
+
+     <div class="alert alert-success" ng-show="successAlertMsg.length > 0" >
+	    <a href="" class="close" data-dismiss="alert" aria-label="close" >&times;</a>
+	    <strong>Success!</strong><span ng-repeat="successMsg in successAlertMsg"><br/>{{successMsg}}<i class="fa fa-check"></i></span>
+	</div>
+	<div class="alert alert-danger" ng-show="failureAlertMsg.length > 0" >
+	    <a href="" class="close" data-dismiss="alert" aria-label="close" >&times;</a>
+	    <strong>Failure!</strong><span ng-repeat="fmsg in failureAlertMsg"><br/>{{fmsg}}<i class="fa fa-times"></i></span>
+	</div>
+
+	
+    <!--
+    <div class="row">
+	    <div class="col-lg-12">
+		    <div class="panel panel-primary">
+			    <div class="panel-heading">
+			    	Products
+			    	<div class="clearfix"></div>
+			    </div>
+			    <div class="panel-body">
+				    <div class="row">
+		    			<div ng-class="class._id == selectedSection.classId ? 'col-md-6' : 'col-md-2'" 
+		    				ng-repeat="attributeGroup in metadata.attributeGroups | orderBy : ['sortKey']">
+					    	<div class="panel panel-primary" >
+					    		<div class="panel-heading">
+					    			{{attributeGroup.name}}
+					    			
+                   					<div class="clearfix"></div>
+					    		</div>
+					    		<div class="panel-body" 
+					    			ng-if="attributeGroup.id == selectedAttributeGroup.id"
+					    			style="height: 80%; overflow-y: scroll;">
+					    			<div class="panel panel-yellow">
+					    				<div class="panel-heading">
+					    					Attributes
+                    						<div class="clearfix"></div>
+				    					</div>
+				    					
+
+						    			<div class="row">
+						    				<div class="panel-body" >
+							            	<form name="classForm">
+									        	<div class="col-md-12" >
+									        		<div class="form-group">
+										        		<div class="form-group">
+
+										        			<div class="col-md-12" 
+										        				ng-repeat="attribute in attributeGroup.attributes">
+												        		<div ng-class="{ 'has-error' : classSubmitted
+												        		&& classForm.className.$invalid }">
+														            <label class="control-label">
+														            	{{attribute.name}} ({{attribute.displayNames[0].displayName}})
+														            	</label>
+
+														            <input 
+														            	ng-if="attribute.valueSets == undefined"
+														            	class="form-control" type="text" name="className"
+														            	ng-model="class.className" 
+														            	placeholder="Value" required>
+
+														            
+														            <select class="form-control" 
+														            	ng-model="selectedValue"
+														            	ng-if="attribute.valueSets != undefined"
+														            	ng-options="value.value for value in attribute.valueSets.values"
+														            	>
+									                                    <option value=""></option>
+									                                </select>
+													        	</div>
+												        	</div>
+												        	
+												        </div>
+										            </div>
+									            </div>
+									            <hr>
+								            </form>
+								            </div>
+						            	</div>
+					    			</div>
+				    			</div>
+				    			<div class="panel-footer" ng-if="attributeGroup.id != selectedAttributeGroup.id">
+				    				<a href="" ng-click="getAttributes(attributeGroup,$index)">View Attributes</a>
+				    			</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	-->
+
+	<div class="col-md-12" ng-if="loadingMetadata == true">
+    	<div class="alert alert-success">
+            <i class="fa fa-spinner fa-pulse"></i> Loading Metadata for <b>{{catalogue.name}}</b>
+        </div>
+    </div>
+
+    <div class="row" ng-if="loadingMetadata == false">
+        <div class="col-md-5">
+        	<div class="panel panel-primary">
+                <div class="panel-heading">
+                    
+                    Attribute Groups 
+                    
+                    <input class="form-control"
+						type="text" ng-model="txtSsearch" class="form-control" 
+						style="width:50%; display:inline;"
+						placeholder="Search">
+					</input>
+					
+					<span class="label label-pill label-warning pull-right" 
+                    	tooltip="Total Attribute Groups">
+                    	{{metadata.attributeGroups.length}}
+                    </span>
+                    
+	    			<div class="clearfix" ></div>
+                </div>
+
+                <div class="panel-body" style="height: 500px; overflow-y: scroll;">
+				    <div class="list-group">
+				        <a href="" class="list-group-item" ng-repeat="attributeGroup in metadata.attributeGroups | orderBy : 'name' | filter : { name : txtSsearch }" 
+				        ng-click="getAttributes(attributeGroup, true)">
+				           	{{attributeGroup.name}} ({{attributeGroup.displayNames[0].displayName}})
+				           	<i class="fa fa-arrow-right pull-right">
+				           	</i>
+				        </a>
+				    </div>
+				</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+        	<div class="panel panel-primary">
+                <div class="panel-heading">
+                    <i class="fa fa-group fa-fw"></i>
+                    Product Level Attributes
+	    			<div class="clearfix" ></div>
+                </div>
+                <div class="panel-body" >
+                	<div class="row">
+                		<form name="classForm">
+				        	<div class="col-md-12" >
+				        		<div class="form-group">
+				        			<div class="col-md-6" 
+				        				ng-repeat="attribute in productLevelAttrs">
+						        		<div ng-class="{ 'has-error' : classSubmitted
+						        		&& classForm.className.$invalid }">
+								            <label class="control-label">
+								            	{{attribute.displayNames[0].displayName}}
+								            	</label>
+
+								            <input 
+								            	ng-if="attribute.valueSets == undefined && 
+								            		attribute.dataType == 'String'
+								            	"
+								            	class="form-control" type="text" name="className"
+								            	ng-model="class.className" required>
+
+								            <input 
+								            	ng-if="attribute.valueSets == undefined && 
+								            		attribute.dataType == 'Number'
+								            	"
+								            	class="form-control" type="number" name="className"
+								            	ng-model="class.className" required>
+								            	
+
+								            <input 
+								            	ng-if="attribute.valueSets == undefined && 
+								            		attribute.dataType == 'Date'
+								            	"
+								            	class="form-control" type="date" name="className"
+								            	ng-model="class.className"  required>
+
+								            <textarea 
+								            	ng-if="attribute.valueSets == undefined && 
+								            		attribute.dataType == 'Long String'
+								            	"
+								            	class="form-control"  name="className"
+								            	ng-model="class.className" required>
+								            </textarea> 
+
+								            <textarea 
+								            	ng-if="attribute.valueSets == undefined && 
+								            		attribute.dataType == 'Translatable String'
+								            	"
+								            	class="form-control"  name="className"
+								            	ng-model="class.className" required>
+								            </textarea> 
+								            	
+
+								            <select class="form-control" 
+								            	ng-model="inputProductJson[attribute.name]"
+								            	ng-if="attribute.valueSets != undefined"
+								            	ng-options="value.value as value.value for value in attribute.valueSets.values"
+								            	>
+			                                    <option value=""></option>
+			                                </select>
+							        	</div>
+						        	</div>
+					            </div>
+				            </div>
+				            <hr>
+			            </form>
+			            <div class="row" style="color: white">&nbsp &nbsp  &nbsp &nbsp aaaa</div>
+	            	</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6" ng-if="parentDataLoading == true">
+        	<div class="alert alert-success">
+	            <i class="fa fa-spinner fa-pulse"></i> Loading..
+	        </div>
+        </div>
+        <div class="col-md-6" ng-if="parentDataLoading == false">
+        	<div class="panel panel-primary">
+                <div class="panel-heading">
+                    <i class="fa fa-group fa-fw"></i>
+                    {{attributeGroup.name}} details
+                    
+	    			<div class="clearfix" ></div>
+                </div>
+                <div class="panel-body" >
+                	<fieldset>
+		            	<div class="col-md-12">
+		            		<div class="col-md-4">
+		            			<label style="font-size: 12px; font-weight: normal;">Name</label>
+		            		</div>
+		            		<div class="col-md-7">
+		            			<label class="label-control">{{attributeGroup.displayNames[0].displayName}}</label>
+		            		</div>
+		            	</div>
+		            	<div class="col-md-12">
+		            		<div class="col-lg-4">
+		            			<label style="font-size: 12px; font-weight: normal;">Behaviour</label>
+		            			
+		            		</div>
+		            		<div class="col-lg-8">
+		            			<label class="label-control">{{attributeGroup.behaviour}}</label>
+		            		</div>
+		            	</div>
+                	</fieldset>
+					
+                	<div class="panel-body" 
+		    			style="height: 80%; overflow-y: scroll;">
+		    			<div class="panel panel-yellow">
+		    				<div class="panel-heading">
+		    					Attributes
+        						<div class="clearfix"></div>
+	    					</div>
+						    <div class="row">
+				            	<form name="classForm">
+						        	<div class="col-md-12" >
+						        		<div class="form-group">
+						        			<div class="col-md-12" 
+						        				ng-repeat="attribute in attributeGroup.attributes">
+								        		<div ng-class="{ 'has-error' : classSubmitted
+								        		&& classForm.className.$invalid }">
+										            <label class="control-label">
+										            	{{attribute.displayNames[0].displayName}}
+										            	</label>
+
+										            <input 
+										            	ng-if="attribute.valueSets == undefined && 
+										            		attribute.dataType == 'String'
+										            	"
+										            	class="form-control" type="text" name="className"
+										            	ng-model="attribute.value" required>
+
+										            <input 
+										            	ng-if="attribute.valueSets == undefined && 
+										            		attribute.dataType == 'Number'
+										            	"
+										            	class="form-control" type="number" name="className"
+										            	ng-model="attribute.value" required>
+										            	
+
+										            <input 
+										            	ng-if="attribute.valueSets == undefined && 
+										            		attribute.dataType == 'Date'
+										            	"
+										            	class="form-control" type="date" name="className"
+										            	ng-model="attribute.value"  required>
+
+										            <textarea 
+										            	ng-if="attribute.valueSets == undefined && 
+										            		attribute.dataType == 'Long String'
+										            	"
+										            	class="form-control"  name="className"
+										            	ng-model="attribute.value" required>
+										            </textarea> 
+
+										            <textarea 
+										            	ng-if="attribute.valueSets == undefined && 
+										            		attribute.dataType == 'Translatable String'
+										            	"
+										            	class="form-control"  name="className"
+										            	ng-model="attribute.value" required>
+										            </textarea> 
+										            	
+
+										            <select class="form-control" 
+										            	ng-model="attribute.value"
+										            	ng-if="attribute.valueSets != undefined"
+										            	ng-options="value.value as value.value for value in attribute.valueSets.values"
+										            	>
+					                                    <option value=""></option>
+					                                </select>
+									        	</div>
+								        	</div>
+							            </div>
+						            </div>
+						            <hr>
+					            </form>
+					            <div class="row" style="color: white">&nbsp &nbsp  &nbsp &nbsp aaaa</div>
+			            	</div>
+			            </div>
+			        </div>
+				</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
